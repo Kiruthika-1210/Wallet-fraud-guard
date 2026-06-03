@@ -1,0 +1,209 @@
+# ============================================================
+# WALLET GUARD - WALLET ROUTER
+# ============================================================
+
+from fastapi import APIRouter
+from pydantic import BaseModel
+from datetime import datetime
+import uuid
+
+# ============================================================
+# IMPORT SERVICES
+# ============================================================
+
+from api.services.feature_builder import (
+    build_features
+)
+
+from api.services.fraud_model import (
+    predict
+)
+
+from api.services.decision_engine import (
+    generate_decision_payload
+)
+
+from api.services.shap_explainer import (
+    analyze_transaction
+)
+
+from api.services.audit_service import (
+    process_audit_log
+)
+
+# ============================================================
+# ROUTER INITIALIZATION
+# ============================================================
+
+router = APIRouter()
+
+# ============================================================
+# REQUEST MODEL
+# ============================================================
+
+class TransactionRequest(BaseModel):
+
+    user_id: int
+
+    wallet_id: int
+
+    amount: float
+
+# ============================================================
+# MOCK USER ANALYTICS
+# ============================================================
+
+# In production:
+# these come from database analytics
+
+def get_user_transaction_stats(
+    user_id
+):
+
+    return {
+
+        "avg_transaction": 2500,
+
+        "std_transaction": 1200,
+
+        "last_10_min_txns": [
+            100,
+            250,
+            500
+        ]
+    }
+
+# ============================================================
+# WALLET TRANSFER ENDPOINT
+# ============================================================
+
+@router.post("/transfer")
+
+def transfer_money(
+    request: TransactionRequest
+):
+
+    # --------------------------------------------------------
+    # Generate Transaction ID
+    # --------------------------------------------------------
+
+    transaction_id = (
+        str(uuid.uuid4())
+    )
+
+    # --------------------------------------------------------
+    # Fetch User Analytics
+    # --------------------------------------------------------
+
+    user_stats = (
+        get_user_transaction_stats(
+            request.user_id
+        )
+    )
+
+    # --------------------------------------------------------
+    # Build Features
+    # --------------------------------------------------------
+
+    features = build_features(
+
+        txn_amount=request.amount,
+
+        user_avg=user_stats[
+            "avg_transaction"
+        ],
+
+        user_std=user_stats[
+            "std_transaction"
+        ],
+
+        last_10_min_txns=user_stats[
+            "last_10_min_txns"
+        ],
+
+        timestamp=datetime.utcnow()
+    )
+
+    # --------------------------------------------------------
+    # ML Fraud Risk Score
+    # --------------------------------------------------------
+
+    ml_risk_score = predict(
+        features
+    )
+
+    # --------------------------------------------------------
+    # Hybrid Decision Engine
+    # --------------------------------------------------------
+
+    decision_payload = (
+        generate_decision_payload(
+            ml_risk_score,
+            features
+        )
+    )
+
+    # --------------------------------------------------------
+    # SHAP Explainability
+    # --------------------------------------------------------
+
+    shap_payload = (
+        analyze_transaction(
+            features
+        )
+    )
+
+    # --------------------------------------------------------
+    # Merge Responses
+    # --------------------------------------------------------
+
+    final_payload = {
+
+        "transaction_id": (
+            transaction_id
+        ),
+
+        "wallet_id": (
+            request.wallet_id
+        ),
+
+        "user_id": (
+            request.user_id
+        ),
+
+        "amount": (
+            request.amount
+        ),
+
+        **decision_payload,
+
+        **shap_payload
+    }
+
+    # --------------------------------------------------------
+    # Audit Logging
+    # --------------------------------------------------------
+
+    process_audit_log(
+
+        transaction_id=transaction_id,
+
+        user_id=request.user_id,
+
+        payload=final_payload
+    )
+
+    # --------------------------------------------------------
+    # Final API Response
+    # --------------------------------------------------------
+
+    return {
+
+        "success": True,
+
+        "message": (
+            "Transaction processed successfully"
+        ),
+
+        "data": final_payload
+    }

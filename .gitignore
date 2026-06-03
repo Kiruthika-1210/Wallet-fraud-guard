@@ -1,0 +1,28 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.ipynb_checkpoints/
+
+# Large datasets
+data/
+processed/
+
+# Artifacts
+artifacts/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+
+# Notebook cache
+*.ipynb_checkpoints
+
+# Database cache
+*.db-wal
+*.db-shm
+
+# OS files
+.DS_Store
+Thumbs.db
