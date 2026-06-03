@@ -3,7 +3,7 @@
 # ============================================================
 
 from fastapi import APIRouter
-
+from fastapi import Depends
 # ============================================================
 # IMPORT SERVICES
 # ============================================================
@@ -20,6 +20,10 @@ from api.services.audit_service import (
 from api.services.db_service import (
 
     get_fraud_transactions
+)
+
+from api.dependencies import (
+    get_current_user
 )
 
 # ============================================================
@@ -49,7 +53,7 @@ def fraud_health_check():
 
 @router.get("/logs")
 
-def fetch_all_fraud_logs():
+def fetch_all_fraud_logs(current_user=Depends(get_current_user)):
 
     logs = get_all_fraud_logs()
 
@@ -127,7 +131,7 @@ def fetch_transaction_log(
 
 @router.get("/rejected")
 
-def fetch_rejected_transactions():
+def fetch_rejected_transactions(current_user=Depends(get_current_user)):
 
     transactions = (
         get_fraud_transactions()
@@ -149,8 +153,7 @@ def fetch_rejected_transactions():
 # ============================================================
 
 @router.get("/analytics")
-
-def fraud_analytics():
+def fraud_analytics(current_user=Depends(get_current_user)):
 
     logs = get_all_fraud_logs()
 
