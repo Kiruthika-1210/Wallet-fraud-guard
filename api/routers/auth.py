@@ -16,6 +16,10 @@ from api.auth_utils import (
     create_access_token
 )
 
+from api.services.db_service import (
+    create_wallet
+)
+
 # ============================================================
 # DATABASE PATH
 # ============================================================
@@ -170,9 +174,16 @@ def register(
         datetime.utcnow().isoformat()
     ))
 
+    user_id = cursor.lastrowid
+
     connection.commit()
 
     connection.close()
+
+    create_wallet(
+    user_id=user_id,
+    initial_balance=10000
+    )
 
     return {
 

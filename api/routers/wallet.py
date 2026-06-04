@@ -6,6 +6,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from datetime import datetime
 import uuid
+import time
 
 # ============================================================
 # IMPORT SERVICES
@@ -31,6 +32,11 @@ from api.services.audit_service import (
     process_audit_log
 )
 
+from api.services.db_service import (
+    save_transaction,
+    get_wallet_balance,
+    update_wallet_balance
+)
 # ============================================================
 # ROUTER INITIALIZATION
 # ============================================================
@@ -82,7 +88,7 @@ def get_user_transaction_stats(
 def transfer_money(
     request: TransactionRequest
 ):
-
+    start_time = time.perf_counter()
     # --------------------------------------------------------
     # Generate Transaction ID
     # --------------------------------------------------------
@@ -193,9 +199,37 @@ def transfer_money(
         payload=final_payload
     )
 
+    save_transaction(
+    transaction_id=transaction_id,
+    user_id=request.user_id,
+    wallet_id=request.wallet_id,
+    amount=request.amount,
+    decision=decision_payload["decision"],
+    risk_score=decision_payload["final_risk_score"]
+    )
+
+    if decision_payload["decision"] == "APPROVE":
+        current_balance = get_wallet_balance(
+            request.wallet_id
+        )
+        
+        if current_balance is not None:
+            update_wallet_balance(
+                request.wallet_id,
+                current_balance - request.amount
+        )
     # --------------------------------------------------------
     # Final API Response
     # --------------------------------------------------------
+
+    end_time = time.perf_counter()
+    
+    latency_ms = round(
+        (end_time - start_time) * 1000,
+        2
+    )
+
+    final_payload["latency_ms"] = latency_ms
 
     return {
 

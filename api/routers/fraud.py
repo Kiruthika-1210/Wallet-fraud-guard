@@ -26,6 +26,10 @@ from api.dependencies import (
     get_current_user
 )
 
+from api.services.analytics_service import (
+    get_fraud_analytics
+)
+
 # ============================================================
 # ROUTER INITIALIZATION
 # ============================================================
@@ -153,68 +157,9 @@ def fetch_rejected_transactions(current_user=Depends(get_current_user)):
 # ============================================================
 
 @router.get("/analytics")
-def fraud_analytics(current_user=Depends(get_current_user)):
+def analytics(
+    current_user=Depends(get_current_user)
+):
 
-    logs = get_all_fraud_logs()
-
-    total_transactions = len(logs)
-
-    rejected = 0
-
-    review = 0
-
-    approved = 0
-
-    for log in logs:
-
-        decision = log[3]
-
-        if decision == "REJECT":
-
-            rejected += 1
-
-        elif decision == "REVIEW":
-
-            review += 1
-
-        else:
-
-            approved += 1
-
-    fraud_rate = 0
-
-    if total_transactions > 0:
-
-        fraud_rate = (
-            rejected / total_transactions
-        ) * 100
-
-    return {
-
-        "success": True,
-
-        "analytics": {
-
-            "total_transactions": (
-                total_transactions
-            ),
-
-            "approved_transactions": (
-                approved
-            ),
-
-            "review_transactions": (
-                review
-            ),
-
-            "rejected_transactions": (
-                rejected
-            ),
-
-            "fraud_rate_percentage": round(
-                fraud_rate,
-                2
-            )
-        }
-    }
+    return get_fraud_analytics()
 

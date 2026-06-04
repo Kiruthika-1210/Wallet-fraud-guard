@@ -175,9 +175,13 @@ def create_user(
         datetime.utcnow().isoformat()
     ))
 
+    user_id = cursor.lastrowid
+    
     connection.commit()
-
+    
     connection.close()
+    
+    return user_id
 
 # ============================================================
 # CREATE WALLET
