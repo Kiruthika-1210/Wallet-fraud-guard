@@ -11,11 +11,13 @@ response = requests.get(
     headers=get_headers()
 )
 
+st.write("Response:")
+
 if response.status_code == 200:
 
-    response_data = response.json()
+    analytics = response.json()
 
-    analytics = response_data["analytics"]
+    st.json(analytics)
 
     col1, col2, col3 = st.columns(3)
 
@@ -34,7 +36,7 @@ if response.status_code == 200:
     with col3:
         st.metric(
             "Fraud Rate",
-            f"{analytics['fraud_rate_percentage']}%"
+            f"{analytics["fraud_rate"]}%"
         )
 
     st.divider()
