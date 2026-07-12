@@ -40,13 +40,23 @@ def apply_rules(features):
     # High Transaction Amount
     # --------------------------------------------------------
 
-    if features.get("Amount", 0) > 5000:
-
+    amount = features.get("Amount", 0)
+    
+    if amount > 10000:
+        
         triggered_rules.append(
             "High transaction amount"
         )
-
+        
+        rule_score += 0.15
+        
+    if amount > 25000:
+        
         rule_score += 0.25
+        
+    if amount > 50000:
+        
+        rule_score += 0.35
 
     # --------------------------------------------------------
     # Night Transaction

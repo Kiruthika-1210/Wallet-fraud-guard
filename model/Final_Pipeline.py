@@ -229,8 +229,8 @@ for rule in rule_triggers:
 # Combine ML score + rule score
 
 final_risk_score = (
-    (0.75 * ml_risk_score) +
-    (0.25 * rule_score)
+    (0.55 * ml_risk_score) +
+    (0.45 * rule_score)
 )
 
 # Ensure score remains between 0 and 1
@@ -245,12 +245,12 @@ print(f"\nFinal Hybrid Risk Score: {final_risk_score:.4f}")
 
 def transaction_decision(score):
 
-    if score < 0.40:
+    if score < 0.30:
         return "APPROVE"
-
-    elif score < 0.75:
+    
+    elif score < 0.50:
         return "REVIEW"
-
+    
     else:
         return "REJECT"
 

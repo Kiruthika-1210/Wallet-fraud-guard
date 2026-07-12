@@ -176,6 +176,8 @@ def register(
 
     user_id = cursor.lastrowid
 
+    create_wallet(user_id)
+
     connection.commit()
 
     connection.close()

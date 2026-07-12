@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 # ============================================================
 # 2. PROJECT PATHS
 # ============================================================
-
+  
 BASE_PATH = ".."
 
 processed_folder = os.path.join(BASE_PATH, "processed")
