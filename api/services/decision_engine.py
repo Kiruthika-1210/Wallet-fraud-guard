@@ -282,6 +282,17 @@ def generate_decision_payload(
         final_risk_score
     )
 
+    # --------------------------------------------------------
+    # Business Override
+    # Extremely high-risk transactions are rejected
+    # regardless of ML confidence.
+    # --------------------------------------------------------
+
+    if (
+        features.get("Amount", 0) >= 100000
+        and rule_score >= 0.80
+    ):
+        decision = "REJECT"
     return {
 
         "ml_risk_score": round(
