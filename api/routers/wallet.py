@@ -62,23 +62,45 @@ class TransactionRequest(BaseModel):
 # In production:
 # these come from database analytics
 
+import random
+
 def get_user_transaction_stats(
     user_id
 ):
 
+    avg_transaction = random.randint(
+        1500,
+        6000
+    )
+
+    std_transaction = random.randint(
+        600,
+        2500
+    )
+
+    last_10_min_txns = [
+
+        random.randint(
+            100,
+            5000
+        )
+
+        for _ in range(
+            random.randint(
+                1,
+                20
+            )
+        )
+    ]
+
     return {
 
-        "avg_transaction": 2500,
+        "avg_transaction": avg_transaction,
 
-        "std_transaction": 1200,
+        "std_transaction": std_transaction,
 
-        "last_10_min_txns": [
-            100,
-            250,
-            500
-        ]
+        "last_10_min_txns": last_10_min_txns
     }
-
 # ============================================================
 # WALLET TRANSFER ENDPOINT
 # ============================================================
@@ -209,15 +231,30 @@ def transfer_money(
     )
 
     if decision_payload["decision"] == "APPROVE":
+
         current_balance = get_wallet_balance(
             request.wallet_id
         )
-        
+
         if current_balance is not None:
-            update_wallet_balance(
-                request.wallet_id,
-                current_balance - request.amount
-        )
+
+            if current_balance >= request.amount:
+
+                update_wallet_balance(
+
+                    request.wallet_id,
+
+                    current_balance - request.amount
+                )
+
+            else:
+
+                return {
+
+                    "success": False,
+
+                    "message": "Insufficient wallet balance"
+                }
     # --------------------------------------------------------
     # Final API Response
     # --------------------------------------------------------

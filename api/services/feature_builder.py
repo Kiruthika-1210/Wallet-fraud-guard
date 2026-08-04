@@ -34,9 +34,10 @@ def build_features(
         / (user_std + 1e-6)
     )
 
-    transaction_velocity = len(
-        last_10_min_txns
-    )
+    transaction_velocity = max(
+    len(last_10_min_txns),
+    random.randint(1, 20)
+)
 
     # --------------------------------------------------------
     # Behavioral Fraud Indicators
@@ -79,8 +80,8 @@ def build_features(
         # ------------------------------------------------------------
         
     elif txn_amount < 10000:
-        device_new = random.choice([0, 1])
-        failed_attempts = random.randint(1, 3)
+        device_new = random.choice([0,0,1])
+        failed_attempts = random.randint(0,2)
         
         geo_distance = round(
             random.uniform(20, 150),
@@ -100,8 +101,8 @@ def build_features(
         # HIGH RISK TRANSACTION
         # ------------------------------------------------------------
     else:
-        device_new = 1
-        failed_attempts = random.randint(3, 6)
+        device_new = random.choice([0,1,1])
+        failed_attempts = random.randint(2, 5)
         
         geo_distance = round(
             random.uniform(150, 500),
@@ -120,10 +121,10 @@ def build_features(
 
 
     high_risk_transaction = (
-    txn_amount > 5000
-    or transaction_velocity > 10
-    or failed_attempts >= 3
-    )
+    (txn_amount > 50000 and failed_attempts >= 3)
+    or (merchant_risk > 0.8 and ip_risk_score > 0.8)
+    or transaction_velocity > 15
+)
 
     # --------------------------------------------------------
     # Base Transaction Features
@@ -146,17 +147,20 @@ def build_features(
         "V8": random.uniform(-5, 5),
         "V9": random.uniform(-5, 5),
         "V10": (
-            random.uniform(-12, -4)
-            if high_risk_transaction
-            else random.uniform(-2, 2)
-        ),
-        "V11": random.uniform(-5, 5),
-        "V10": (
-            random.uniform(-12, -4)
-            if high_risk_transaction
-            else random.uniform(-2, 2)
-        ),
-        "V13": random.uniform(-5, 5),
+    random.uniform(-12, -4)
+    if high_risk_transaction
+    else random.uniform(-2, 2)
+),
+
+"V11": random.uniform(-5, 5),
+
+"V12": (
+    random.uniform(-10, -3)
+    if high_risk_transaction
+    else random.uniform(-2, 2)
+),
+
+"V13": random.uniform(-5, 5),
         "V14": (
             random.uniform(-15, -5)
             if high_risk_transaction

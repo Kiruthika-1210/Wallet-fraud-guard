@@ -43,21 +43,14 @@ def apply_rules(features):
     amount = features.get("Amount", 0)
     
     if amount > 10000:
-        
-        triggered_rules.append(
-            "High transaction amount"
-        )
-        
-        rule_score += 0.15
-        
+        triggered_rules.append("High transaction amount")
+        rule_score += 0.10
     if amount > 25000:
-        
-        rule_score += 0.25
-        
+        rule_score += 0.10
     if amount > 50000:
-        
-        rule_score += 0.35
-
+        rule_score += 0.15
+    if amount > 100000:
+        rule_score += 0.15
     # --------------------------------------------------------
     # Night Transaction
     # --------------------------------------------------------
@@ -71,7 +64,7 @@ def apply_rules(features):
             "Night-time transaction"
         )
 
-        rule_score += 0.15
+        rule_score += 0.05
 
     # --------------------------------------------------------
     # New Device
@@ -86,7 +79,7 @@ def apply_rules(features):
             "New device detected"
         )
 
-        rule_score += 0.20
+        rule_score += 0.08
 
     # --------------------------------------------------------
     # Failed Login Attempts
@@ -101,7 +94,7 @@ def apply_rules(features):
             "Multiple failed attempts"
         )
 
-        rule_score += 0.20
+        rule_score += 0.10
 
     # --------------------------------------------------------
     # High Transaction Velocity
@@ -116,7 +109,7 @@ def apply_rules(features):
             "High transaction velocity"
         )
 
-        rule_score += 0.25
+        rule_score += 0.15
 
     # --------------------------------------------------------
     # High-Risk Merchant
@@ -131,7 +124,7 @@ def apply_rules(features):
             "High-risk merchant"
         )
 
-        rule_score += 0.15
+        rule_score += 0.10
 
     # --------------------------------------------------------
     # Suspicious IP Risk
@@ -146,7 +139,7 @@ def apply_rules(features):
             "Suspicious IP risk score"
         )
 
-        rule_score += 0.15
+        rule_score += 0.10
 
     # --------------------------------------------------------
     # Geo-Distance Risk
@@ -161,7 +154,7 @@ def apply_rules(features):
             "Abnormal geo-distance"
         )
 
-        rule_score += 0.15
+        rule_score += 0.07
 
     # --------------------------------------------------------
     # Cap Rule Score
@@ -197,13 +190,12 @@ def combine_risk_scores(
 
     final_risk_score = (
 
-        (0.55 * ml_risk_score)
+    (0.70 * ml_risk_score)
 
-        +
+    +
 
-        (0.45 * rule_score)
-    )
-
+    (0.30 * rule_score)
+)
     final_risk_score = min(
         final_risk_score,
         1.0
@@ -226,7 +218,7 @@ def make_decision(
     # APPROVE
     # --------------------------------------------------------
 
-    if final_risk_score < 0.30:
+    if final_risk_score < 0.40:
 
         return "APPROVE"
 
@@ -234,7 +226,7 @@ def make_decision(
     # REVIEW
     # --------------------------------------------------------
 
-    elif final_risk_score < 0.50:
+    elif final_risk_score < 0.70:
 
         return "REVIEW"
 
