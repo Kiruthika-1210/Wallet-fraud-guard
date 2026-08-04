@@ -119,13 +119,18 @@ def build_features(
             4
         )
 
-
     high_risk_transaction = (
-    (txn_amount > 50000 and failed_attempts >= 3)
-    or (merchant_risk > 0.8 and ip_risk_score > 0.8)
-    or transaction_velocity > 15
-)
-
+        txn_amount >= 75000
+        or (
+            merchant_risk > 0.8
+            and ip_risk_score > 0.8
+        )
+        or (
+            failed_attempts >= 3
+            and device_new == 1
+        )
+        or transaction_velocity > 15
+    )
     # --------------------------------------------------------
     # Base Transaction Features
     # --------------------------------------------------------
