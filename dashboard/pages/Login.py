@@ -67,6 +67,10 @@ with tab2:
 
     with st.form("register_form"):
 
+        register_name = st.text_input(
+    "Full Name"
+)
+
         email = st.text_input(
             "Register Email"
         )
@@ -89,6 +93,7 @@ with tab2:
                 f"{BASE_URL}/auth/register",
 
                 json={
+                    "name": register_name,
 
                     "email": email,
 
