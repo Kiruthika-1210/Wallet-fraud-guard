@@ -160,9 +160,9 @@ Examples:
 
 ```text
 Final Risk Score =
-(0.55 × ML Risk Score)
+(0.70 × ML Risk Score)
 +
-(0.45 × Rule Risk Score)
+(0.30 × Rule Risk Score)
 ```
 
 ### Decision Logic
